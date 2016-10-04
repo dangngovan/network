@@ -1,0 +1,29 @@
+import smtplib
+import commands
+"""
+Script send info when ping loss
+"""
+# Khai bap smtp server
+FROM = "******"
+TO = ['*****']
+
+# Khai bao danh sach IP can check
+list_ip = ['12****','12***']
+
+# Noi dung mail 
+for i in list_ip:
+	if commands.getoutput("fping %s"%i).split()[2]=='unreachable':
+		SUBJECT = commands.getoutput("wget http://ipinfo.io/ip -qO -")
+		TRACERT = commands.getoutput("traceroute -I %s"%i)
+		BODY = "%s\n"%TRACERT
+		msg = """\
+		From: %s
+		To: %s
+		Subject: CHECK NETWORK DOWNLOAD SPEED FROM %s
+		%s
+		"""%(FROM,", ".join(TO), SUBJECT, BODY)
+		server = smtplib.SMTP('mail.cnht.vn', 587)
+		server.starttls()
+		server.login("****@cnht.vn", "Password")
+		server.sendmail(FROM, TO, msg)
+		server.quit()
